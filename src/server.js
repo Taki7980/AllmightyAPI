@@ -1,0 +1,12 @@
+import app from "./app.js";
+
+const port = 8000 || process.env.PORT
+
+app.listen(port,()=>{
+  console.log(`server is running in port ${port}....`)
+})
+  
+
+
+ 
+
