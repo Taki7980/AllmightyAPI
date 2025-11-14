@@ -5,6 +5,7 @@ import morgan from 'morgan';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import authRouter from '#routes/auth.routes.js';
+import { securityMiddleware } from '#middleware/security.middleware.js';
 
 const app = express();
 app.use(helmet());
@@ -19,6 +20,7 @@ app.use(
     },
   })
 );
+app.use(securityMiddleware);
 app.use(cors());
 app.use(cookieParser());
 

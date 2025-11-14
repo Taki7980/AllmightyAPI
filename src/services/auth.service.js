@@ -40,8 +40,7 @@ export const createUser = async ({ name, email, password, role = 'user' }) => {
   }
 };
 
-
-export const findUserByEmail = async (email) => {
+export const findUserByEmail = async email => {
   const result = await db.select().from(users).where(eq(users.email, email));
   return result[0] || null;
 };
