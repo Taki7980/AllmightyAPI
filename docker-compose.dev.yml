@@ -1,0 +1,76 @@
+services:
+  # Neon Local proxy service for ephemeral database branches
+  neon-local:
+    image: neondatabase/neon_local:latest
+    container_name: allmightyapi-neon-local
+    env_file:
+      - .env.development
+    environment:
+      # These variables are used by Neon Local to create ephemeral branches
+      NEON_API_KEY: ${NEON_API_KEY}
+      NEON_PROJECT_ID: ${NEON_PROJECT_ID}
+      PARENT_BRANCH_ID: ${PARENT_BRANCH_ID}
+      # Ephemeral branches are automatically deleted when container stops
+      DELETE_BRANCH: 'true'
+    ports:
+      - '5432:5432'
+    networks:
+      - app-network
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          "PGPASSWORD=npg psql -h localhost -U neon -d neondb -c 'SELECT 1' > /dev/null 2>&1 || exit 1",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+    # Uncomment below to persist one branch per Git branch instead of ephemeral
+    # volumes:
+    #   - ./.neon_local/:/tmp/.neon_local
+    #   - ./.git/HEAD:/tmp/.git/HEAD:ro,consistent
+
+  # Application service
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runner
+    container_name: allmightyapi-dev
+    depends_on:
+      neon-local:
+        condition: service_healthy
+    env_file:
+      - .env.development
+    environment:
+      # Override with service name for Docker network resolution
+      DATABASE_URL: postgres://neon:npg@neon-local:5432/neondb?sslmode=require
+      NODE_ENV: development
+      PORT: ${PORT:-8000}
+      LOG_LEVEL: ${LOG_LEVEL:-debug}
+    ports:
+      - '${PORT:-8000}:8000'
+    networks:
+      - app-network
+    # Uncomment for hot-reload development (requires nodemon or --watch flag)
+    # volumes:
+    #   - ./src:/usr/src/app/src:delegated
+    #   - ./logs:/usr/src/app/logs:delegated
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "require('http').get('http://localhost:8000/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  app-network:
+    driver: bridge
