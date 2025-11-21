@@ -1,7 +1,7 @@
 import logger from '#config/logger.js';
 import bcrypt from 'bcrypt';
 import { db } from '#config/database.js';
-import { users } from '#models/user.model.js';
+import users from '#models/user.model.js';
 import { eq } from 'drizzle-orm';
 
 export const hashedPassword = async password => {
@@ -15,7 +15,7 @@ export const hashedPassword = async password => {
 
 export const createUser = async ({ name, email, password, role = 'user' }) => {
   try {
-    const exixtingUser = db
+    const exixtingUser = await db
       .select()
       .from(users)
       .where(eq(users.email, email))
