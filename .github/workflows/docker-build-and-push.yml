@@ -17,6 +17,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Set lowercase repository name
+        id: repo
+        run: echo "name=$(echo ${{ github.event.repository.name }} | tr '[:upper:]' '[:lower:]')" >> "$GITHUB_OUTPUT"
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
@@ -33,7 +37,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ secrets.DOCKER_USERNAME }}/${{ github.event.repository.name }}
+          images: ${{ secrets.DOCKER_USERNAME }}/${{ steps.repo.outputs.name }}
           tags: |
             type=ref,event=branch
             type=sha
@@ -48,12 +52,12 @@ jobs:
           platforms: linux/amd64,linux/arm64
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/${{ github.event.repository.name }}:buildcache
-          cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/${{ github.event.repository.name }}:buildcache,mode=max
+          cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/${{ steps.repo.outputs.name }}:buildcache
+          cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/${{ steps.repo.outputs.name }}:buildcache,mode=max
 
       - name: Publish summary
         run: |
           echo "## Docker Image Published" >> "$GITHUB_STEP_SUMMARY"
-          echo "Image: ${{ secrets.DOCKER_USERNAME }}/${{ github.event.repository.name }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "Image: ${{ secrets.DOCKER_USERNAME }}/${{ steps.repo.outputs.name }}" >> "$GITHUB_STEP_SUMMARY"
           echo "Tags:" >> "$GITHUB_STEP_SUMMARY"
           echo "${{ steps.meta.outputs.tags }}" >> "$GITHUB_STEP_SUMMARY"
