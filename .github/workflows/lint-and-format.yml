@@ -1,0 +1,41 @@
+name: Lint and Format
+
+on:
+  push:
+    branches: [main, staging]
+  pull_request:
+    branches: [main, staging]
+
+jobs:
+  lint-and-format:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm ci
+
+      - name: Run ESLint
+        run: pnpm lint
+
+      - name: Run Prettier (check only)
+        run: pnpm run format:check
+
+      - name: Provide fix suggestions on failure
+        if: failure()
+        run: |
+          echo "::error title=Lint/Format issues detected::One or more lint/format checks failed."
+          echo "::notice title=How to fix::Run 'npm run lint:fix' to auto-fix lint issues and 'npm run format' to apply Prettier formatting locally before pushing again."
