@@ -5,7 +5,7 @@ import users from '#models/user.model.js';
 import { eq } from 'drizzle-orm';
 
 export const hashedPassword = async password => {
-  const saltRounds = 10; // bcrypt default
+  const saltRounds = 10;
   try {
     return await bcrypt.hash(password, saltRounds);
   } catch (error) {
@@ -26,6 +26,7 @@ export const createUser = async ({ name, email, password, role = 'user' }) => {
     }
 
     const hash_password = await hashedPassword(password);
+    
     const [newUser] = await db
       .insert(users)
       .values({ name, email, password: hash_password, role })

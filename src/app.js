@@ -30,12 +30,13 @@ app.get('/', (req, res) => {
 });
 
 app.get('/health', (req, res) => {
-  res.status(200).json({
+  res.json({
     status: 'ok',
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
   });
 });
+
 app.get('/api', (req, res) => {
   res.status(200).json({
     message: 'AllmightyAPI running',
@@ -46,7 +47,7 @@ app.get('/api', (req, res) => {
 app.use('/api/auth', authRouter);
 app.use('/api/users', UserRouter);
 
-// 404 handler
+// catch all - 404
 app.use((req, res) => {
   res.status(404).json({ error: 'Route not found' });
 });

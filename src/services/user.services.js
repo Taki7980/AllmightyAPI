@@ -5,7 +5,7 @@ import { eq } from 'drizzle-orm';
 
 export const getAllUsersService = async () => {
   try {
-    return await db
+    const result = await db
       .select({
         id: users.id,
         email: users.email,
@@ -15,6 +15,7 @@ export const getAllUsersService = async () => {
         updated_at: users.updated_at,
       })
       .from(users);
+    return result;
   } catch (error) {
     logger.error('Error getting users', error);
     throw new Error('Error fetching users');
@@ -52,7 +53,6 @@ export const getUserByIdService = async id => {
 
 export const updateUserService = async (id, updates) => {
   try {
-    // check if user exists first
     const existingUser = await db
       .select()
       .from(users)

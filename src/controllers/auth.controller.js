@@ -18,12 +18,7 @@ export const signup = async (req, res, next) => {
 
     const { name, email, password, role } = validationResult.data;
 
-    const user = await createUser({
-      name,
-      email,
-      password,
-      role: role || 'user',
-    });
+    const user = await createUser({ name, email, password, role: role || 'user' });
 
     const token = jwttoken.sign({
       id: user.id,

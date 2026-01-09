@@ -18,7 +18,6 @@ export const authenticate = (req, res, next) => {
       email: decoded.email,
       role: decoded.role,
     };
-
     next();
   } catch (error) {
     logger.error('Auth error:', error);

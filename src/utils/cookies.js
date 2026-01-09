@@ -3,7 +3,7 @@ export const cookies = {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'strict',
-    maxAge: 24 * 60 * 60 * 1000, // 1 day to match JWT expiry
+    maxAge: 24 * 60 * 60 * 1000, // 1 day
   }),
   set: (res, name, value, options = {}) => {
     res.cookie(name, value, { ...cookies.getOptions(), ...options });

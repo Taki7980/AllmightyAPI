@@ -71,7 +71,7 @@ export const updateUserById = async (req, res, next) => {
     const { id } = paramValidation.data;
     const updates = bodyValidation.data;
 
-    // users can only update their own profile unless they're admin
+    // check permissions
     if (req.user.id !== id && req.user.role !== 'admin') {
       return res.status(403).json({
         error: 'Forbidden',
@@ -79,7 +79,7 @@ export const updateUserById = async (req, res, next) => {
       });
     }
 
-    // role changes require admin
+    // only admins can change roles
     if (updates.role && req.user.role !== 'admin') {
       return res.status(403).json({
         error: 'Forbidden',
@@ -87,7 +87,6 @@ export const updateUserById = async (req, res, next) => {
       });
     }
     const updatedUser = await updateUserService(id, updates);
-
     return res.json({
       message: 'User updated successfully',
       user: updatedUser,
@@ -119,8 +118,8 @@ export const deleteUserById = async (req, res, next) => {
         message: 'You can only delete your own profile',
       });
     }
-    await deleteUserService(id);
 
+    await deleteUserService(id);
     return res.json({
       message: 'User deleted successfully',
     });
