@@ -9,7 +9,7 @@ export const securityMiddleware = async (req, res, next) => {
     }
 
     const role = req.user?.role || 'guest';
-    
+
     // rate limits based on user role
     const limits = {
       admin: 20,

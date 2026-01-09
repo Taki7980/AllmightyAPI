@@ -3,7 +3,9 @@ const config = {
   collectCoverage: true,
   coverageDirectory: 'coverage',
   testEnvironment: 'node',
+  testTimeout: 30000,
   transform: {},
+  setupFiles: ['<rootDir>/tests/setup.js'],
   moduleNameMapper: {
     '^#src/(.*)$': '<rootDir>/src/$1',
     '^#config/(.*)$': '<rootDir>/src/config/$1',

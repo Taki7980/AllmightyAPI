@@ -36,13 +36,13 @@ export const requireAdmin = (req, res, next) => {
       message: 'Authentication required',
     });
   }
-  
+
   if (req.user.role !== 'admin') {
     return res.status(403).json({
       error: 'Forbidden',
       message: 'Admin access required',
     });
   }
-  
+
   next();
 };

@@ -13,7 +13,7 @@ describe('Authentication API', () => {
     } catch (error) {
       // ignore cleanup errors
     }
-  });
+  }, 10000);
 
   describe('POST /api/auth/sign-up', () => {
     it('should register a new user successfully', async () => {

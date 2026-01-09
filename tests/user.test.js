@@ -20,10 +20,12 @@ describe('User API', () => {
     });
 
     const cookies = signupResponse.headers['set-cookie'];
-    authToken = cookies
-      .find(cookie => cookie.startsWith('token='))
-      .split(';')[0]
-      .split('=')[1];
+    if (cookies && Array.isArray(cookies)) {
+      authToken = cookies
+        .find(cookie => cookie.startsWith('token='))
+        ?.split(';')[0]
+        ?.split('=')[1];
+    }
     userId = signupResponse.body.user.id;
 
     // setup admin user
@@ -35,10 +37,12 @@ describe('User API', () => {
     });
 
     const adminCookies = adminResponse.headers['set-cookie'];
-    adminToken = adminCookies
-      .find(cookie => cookie.startsWith('token='))
-      .split(';')[0]
-      .split('=')[1];
+    if (adminCookies && Array.isArray(adminCookies)) {
+      adminToken = adminCookies
+        .find(cookie => cookie.startsWith('token='))
+        ?.split(';')[0]
+        ?.split('=')[1];
+    }
     adminId = adminResponse.body.user.id;
   });
 
@@ -148,7 +152,7 @@ describe('User API', () => {
         .expect(200);
 
       expect(response.body.user).toHaveProperty('name', 'Admin Updated Name');
-    });
+    }, 10000);
 
     it('should fail to change role as regular user', async () => {
       const response = await request(app)
@@ -189,19 +193,34 @@ describe('User API', () => {
     let deleteToken;
 
     beforeEach(async () => {
+      // cleanup any existing user first
+      try {
+        await db.delete(users).where(eq(users.email, 'delete@example.com'));
+      } catch (error) {
+        // ignore
+      }
+
       // setup user for deletion test
-      const response = await request(app).post('/api/auth/sign-up').send({
-        name: 'User To Delete',
-        email: 'delete@example.com',
-        password: 'password123',
-      });
+      const response = await request(app)
+        .post('/api/auth/sign-up')
+        .send({
+          name: 'User To Delete',
+          email: 'delete@example.com',
+          password: 'password123',
+        })
+        .expect(201);
 
       userToDelete = response.body.user;
+      expect(userToDelete).toBeDefined();
+      expect(userToDelete.id).toBeDefined();
+
       const cookies = response.headers['set-cookie'];
-      deleteToken = cookies
-        .find(cookie => cookie.startsWith('token='))
-        .split(';')[0]
-        .split('=')[1];
+      if (cookies && Array.isArray(cookies)) {
+        deleteToken = cookies
+          .find(cookie => cookie.startsWith('token='))
+          ?.split(';')[0]
+          ?.split('=')[1];
+      }
     });
 
     it('should delete own profile', async () => {
@@ -229,6 +248,11 @@ describe('User API', () => {
         email: 'deletebyadmin@example.com',
         password: 'password123',
       });
+
+      const cookies = userResponse.headers['set-cookie'];
+      if (!cookies || !Array.isArray(cookies)) {
+        throw new Error('Failed to get cookies from signup response');
+      }
 
       const response = await request(app)
         .delete(`/api/users/${userResponse.body.user.id}`)

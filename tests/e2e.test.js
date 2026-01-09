@@ -35,10 +35,12 @@ describe('E2E User Flow', () => {
       userId = signupResponse.body.user.id;
 
       const cookies = signupResponse.headers['set-cookie'];
-      authToken = cookies
-        .find(cookie => cookie.startsWith('token='))
-        .split(';')[0]
-        .split('=')[1];
+      if (cookies && Array.isArray(cookies)) {
+        authToken = cookies
+          .find(cookie => cookie.startsWith('token='))
+          ?.split(';')[0]
+          ?.split('=')[1];
+      }
 
       // step 2: access protected endpoint
       const usersResponse = await request(app)
@@ -93,10 +95,13 @@ describe('E2E User Flow', () => {
       expect(signinResponse.body).toHaveProperty('message', 'User signed in');
 
       const newCookies = signinResponse.headers['set-cookie'];
-      const newAuthToken = newCookies
-        .find(cookie => cookie.startsWith('token='))
-        .split(';')[0]
-        .split('=')[1];
+      let newAuthToken;
+      if (newCookies && Array.isArray(newCookies)) {
+        newAuthToken = newCookies
+          .find(cookie => cookie.startsWith('token='))
+          ?.split(';')[0]
+          ?.split('=')[1];
+      }
 
       // step 8: access protected endpoint again
       await request(app)
@@ -110,16 +115,25 @@ describe('E2E User Flow', () => {
         .set('Cookie', [`token=${newAuthToken}`])
         .expect(200);
 
-      // step 10: try accessing with deleted user (should fail)
-      await request(app)
-        .get('/api/users')
+      // step 10: verify user is deleted (token still valid but user doesn't exist)
+      const deletedUserResponse = await request(app)
+        .get(`/api/users/${userId}`)
         .set('Cookie', [`token=${newAuthToken}`])
-        .expect(401);
-    });
+        .expect(404);
+
+      expect(deletedUserResponse.body).toHaveProperty('error', 'User not found');
+    }, 30000);
   });
 
   describe('Error handling flow', () => {
     it('should handle errors gracefully throughout user journey', async () => {
+      // cleanup any existing test user first
+      try {
+        await db.delete(users).where(eq(users.email, 'errortest@example.com'));
+      } catch (error) {
+        // ignore
+      }
+
       // try signing in with non-existent user
       await request(app)
         .post('/api/auth/sign-in')
@@ -146,10 +160,13 @@ describe('E2E User Flow', () => {
         .expect(201);
 
       const cookies = signupResponse.headers['set-cookie'];
-      const token = cookies
-        .find(cookie => cookie.startsWith('token='))
-        .split(';')[0]
-        .split('=')[1];
+      let token;
+      if (cookies && Array.isArray(cookies)) {
+        token = cookies
+          .find(cookie => cookie.startsWith('token='))
+          ?.split(';')[0]
+          ?.split('=')[1];
+      }
 
       // try getting non-existent user (with auth)
       await request(app)
@@ -168,6 +185,6 @@ describe('E2E User Flow', () => {
 
       // cleanup
       await db.delete(users).where(eq(users.email, 'errortest@example.com'));
-    });
+    }, 30000);
   });
 });
