@@ -1,7 +1,7 @@
 {
   "name": "AllmightyAPI",
   "version": "1.0.0",
-  "description": "",
+  "description": "REST API with authentication and user management",
   "type": "module",
   "main": "index.js",
   "imports": {

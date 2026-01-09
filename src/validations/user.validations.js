@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const userIdSchema = z.object({
-  id: z.string().regex(/^\d+$/, 'ID must be a valid number'),
+  id: z.string().regex(/^\d+$/, 'ID must be a valid number').transform(Number),
 });
 
 export const updateUserSchema = z.object({

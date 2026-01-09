@@ -15,12 +15,12 @@ export const hashedPassword = async password => {
 
 export const createUser = async ({ name, email, password, role = 'user' }) => {
   try {
-    const exixtingUser = await db
+    const existingUser = await db
       .select()
       .from(users)
       .where(eq(users.email, email))
       .limit(1);
-    if (exixtingUser.length > 0) throw new Error('User already exists');
+    if (existingUser.length > 0) throw new Error('User with this email already exists');
     const hash_password = await hashedPassword(password);
     const [newUser] = await db
       .insert(users)
@@ -35,12 +35,20 @@ export const createUser = async ({ name, email, password, role = 'user' }) => {
     logger.info(`user ${newUser.email} created successfully`);
     return newUser;
   } catch (error) {
-    logger.error(`Error while creating an User: ${error}`);
-    throw new Error('Error creating an User');
+    logger.error(`Error while creating user: ${error}`);
+    if (error.message === 'User with this email already exists') {
+      throw error;
+    }
+    throw new Error('Error creating user');
   }
 };
 
 export const findUserByEmail = async email => {
-  const result = await db.select().from(users).where(eq(users.email, email));
-  return result[0] || null;
+  try {
+    const result = await db.select().from(users).where(eq(users.email, email));
+    return result[0] || null;
+  } catch (error) {
+    logger.error(`Error finding user by email: ${email}`, error);
+    throw error;
+  }
 };

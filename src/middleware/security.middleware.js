@@ -17,9 +17,8 @@ export const securityMiddleware = async (req, res, next) => {
       case 'user':
         limit = 10;
         break;
-      case 'guest':
+      default:
         limit = 5;
-        break;
     }
     const client = aj.withRule(
       slidingWindow({
@@ -30,46 +29,14 @@ export const securityMiddleware = async (req, res, next) => {
       })
     );
     const decision = await client.protect(req);
+    
     if (decision.isDenied() && decision.reason.isBot()) {
       logger.warn('Bot req blocked', {
         ip: req.ip,
         userAgent: req.get('User-Agent'),
         path: req.path,
       });
-      res.status(403).json({
-        error: 'Forbidden',
-        message: 'Automated requests are not allowed',
-      });
-    }
-    if (decision.isDenied() && decision.reason.isBot()) {
-      logger.warn('Bot req blocked', {
-        ip: req.ip,
-        userAgent: req.get('User-Agent'),
-        path: req.path,
-      });
-      res.status(403).json({
-        error: 'Forbidden',
-        message: 'Automated requests are not allowed',
-      });
-    }
-    if (decision.isDenied() && decision.reason.isBot()) {
-      logger.warn('Bot req blocked', {
-        ip: req.ip,
-        userAgent: req.get('User-Agent'),
-        path: req.path,
-      });
-      res.status(403).json({
-        error: 'Forbidden',
-        message: 'Automated requests are not allowed',
-      });
-    }
-    if (decision.isDenied() && decision.reason.isBot()) {
-      logger.warn('Bot req blocked', {
-        ip: req.ip,
-        userAgent: req.get('User-Agent'),
-        path: req.path,
-      });
-      res.status(403).json({
+      return res.status(403).json({
         error: 'Forbidden',
         message: 'Automated requests are not allowed',
       });
@@ -81,7 +48,7 @@ export const securityMiddleware = async (req, res, next) => {
         path: req.path,
         method: req.method,
       });
-      res.status(403).json({
+      return res.status(403).json({
         error: 'Forbidden',
         message: 'Request blocked by security policy',
       });
@@ -92,17 +59,17 @@ export const securityMiddleware = async (req, res, next) => {
         userAgent: req.get('User-Agent'),
         path: req.path,
       });
-      res.status(403).json({
-        error: 'Forbidden',
-        message: 'Too many requests',
+      return res.status(429).json({
+        error: 'Too Many Requests',
+        message: 'Rate limit exceeded. Please try again later.',
       });
     }
     next();
   } catch (error) {
-    console.error('Arcjet middleware error: ', error);
-    res.status(501).json({
-      error: 'Internal server error: ',
-      message: 'something went wrong with security middleware',
+    logger.error('Arcjet middleware error:', error);
+    res.status(500).json({
+      error: 'Internal server error',
+      message: 'Something went wrong with security middleware',
     });
   }
 };

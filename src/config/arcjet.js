@@ -5,12 +5,9 @@ const aj = arcjet({
   rules: [
     shield({ mode: 'LIVE' }),
     detectBot({
-      mode: 'LIVE', // Blocks requests. Use "DRY_RUN" to log only
-      allow: [
-        'CATEGORY:SEARCH_ENGINE', // Google, Bing, etc
-      ],
+      mode: 'LIVE',
+      allow: ['CATEGORY:SEARCH_ENGINE'], // allow search engines
     }),
-
     slidingWindow({
       mode: 'LIVE',
       interval: '2s',
@@ -18,4 +15,5 @@ const aj = arcjet({
     }),
   ],
 });
+
 export default aj;

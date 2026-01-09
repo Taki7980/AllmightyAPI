@@ -1,7 +1,7 @@
 import logger from '#config/logger.js';
 import jwt from 'jsonwebtoken';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'secret key of jwt';
+const JWT_SECRET = process.env.JWT_SECRET || 'secret key of jwt'; // TODO: change default in production
 const JWT_EXPIRES_IN = '1d';
 
 export const jwttoken = {

@@ -13,15 +13,14 @@ import { formatValidationErrors } from '#utils/format.js';
 
 export const fetchAllUsers = async (req, res, next) => {
   try {
-    logger.info('Getting all Users...');
     const allUsers = await getAllUsersService();
     res.json({
-      message: 'Successfully retrived users',
+      message: 'Successfully retrieved users',
       users: allUsers,
       count: allUsers.length,
     });
   } catch (error) {
-    logger.error(error);
+    logger.error('Error fetching users:', error);
     next(error);
   }
 };
@@ -37,9 +36,7 @@ export const fetchUserById = async (req, res, next) => {
     }
 
     const { id } = validationResult.data;
-    logger.info(`Getting user with ID: ${id}`);
-
-    const user = await getUserByIdService(parseInt(id));
+    const user = await getUserByIdService(id);
     res.json({
       message: 'Successfully retrieved user',
       user,
@@ -73,26 +70,23 @@ export const updateUserById = async (req, res, next) => {
 
     const { id } = paramValidation.data;
     const updates = bodyValidation.data;
-    const userId = parseInt(id);
 
-    // Check if user is trying to update their own profile or is an admin
-    if (req.user.id !== userId && req.user.role !== 'admin') {
+    // users can only update their own profile unless they're admin
+    if (req.user.id !== id && req.user.role !== 'admin') {
       return res.status(403).json({
         error: 'Forbidden',
         message: 'You can only update your own profile',
       });
     }
 
-    // Only admins can change roles
+    // role changes require admin
     if (updates.role && req.user.role !== 'admin') {
       return res.status(403).json({
         error: 'Forbidden',
         message: 'Only admins can change user roles',
       });
     }
-
-    logger.info(`Updating user with ID: ${id}`);
-    const updatedUser = await updateUserService(userId, updates);
+    const updatedUser = await updateUserService(id, updates);
 
     res.json({
       message: 'User updated successfully',
@@ -118,18 +112,14 @@ export const deleteUserById = async (req, res, next) => {
     }
 
     const { id } = validationResult.data;
-    const userId = parseInt(id);
 
-    // Check if user is trying to delete their own profile or is an admin
-    if (req.user.id !== userId && req.user.role !== 'admin') {
+    if (req.user.id !== id && req.user.role !== 'admin') {
       return res.status(403).json({
         error: 'Forbidden',
         message: 'You can only delete your own profile',
       });
     }
-
-    logger.info(`Deleting user with ID: ${id}`);
-    await deleteUserService(userId);
+    await deleteUserService(id);
 
     res.json({
       message: 'User deleted successfully',

@@ -17,7 +17,7 @@ export const getAllUsersService = async () => {
       .from(users);
   } catch (error) {
     logger.error('Error getting users', error);
-    throw new Error('Error fetching all Users');
+    throw new Error('Error fetching users');
   }
 };
 
@@ -52,7 +52,6 @@ export const getUserByIdService = async id => {
 
 export const updateUserService = async (id, updates) => {
   try {
-    // Check if user exists
     const existingUser = await db
       .select()
       .from(users)
@@ -62,8 +61,6 @@ export const updateUserService = async (id, updates) => {
     if (existingUser.length === 0) {
       throw new Error('User not found');
     }
-
-    // Update user
     const [updatedUser] = await db
       .update(users)
       .set({
@@ -93,7 +90,6 @@ export const updateUserService = async (id, updates) => {
 
 export const deleteUserService = async id => {
   try {
-    // Check if user exists
     const existingUser = await db
       .select()
       .from(users)
@@ -103,8 +99,6 @@ export const deleteUserService = async id => {
     if (existingUser.length === 0) {
       throw new Error('User not found');
     }
-
-    // Delete user
     await db.delete(users).where(eq(users.id, id));
 
     logger.info(`User ${id} deleted successfully`);

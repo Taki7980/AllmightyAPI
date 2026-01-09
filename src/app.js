@@ -26,7 +26,6 @@ app.use(cors());
 app.use(cookieParser());
 
 app.get('/', (req, res) => {
-  logger.info('hello from allMightyAPI');
   res.send('hello world');
 });
 
@@ -39,15 +38,17 @@ app.get('/health', (req, res) => {
 });
 app.get('/api', (req, res) => {
   res.status(200).json({
-    message: 'allMightyAPI runnnig',
+    message: 'AllmightyAPI running',
     timestamp: new Date().toISOString(),
   });
 });
 
 app.use('/api/auth', authRouter);
 app.use('/api/users', UserRouter);
+
+// catch 404
 app.use((req, res) => {
-  res.status(404).json({ error: 'Route Not Found...' });
+  res.status(404).json({ error: 'Route not found' });
 });
 
 export default app;

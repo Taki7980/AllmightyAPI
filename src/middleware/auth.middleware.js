@@ -21,8 +21,8 @@ export const authenticate = (req, res, next) => {
 
     next();
   } catch (error) {
-    logger.error('Authentication error', error);
-    res.status(401).json({
+    logger.error('Auth error:', error);
+    return res.status(401).json({
       error: 'Unauthorized',
       message: 'Invalid or expired token',
     });

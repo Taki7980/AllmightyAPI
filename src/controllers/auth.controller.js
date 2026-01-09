@@ -6,9 +6,6 @@ import { cookies } from '#utils/cookies.js';
 import { signupSchema, signinSchema } from '#validations/auth.validations.js';
 import bcrypt from 'bcrypt';
 
-// =====================
-// SIGNUP
-// =====================
 export const signup = async (req, res, next) => {
   try {
     const validationResult = signupSchema.safeParse(req.body);
@@ -31,7 +28,7 @@ export const signup = async (req, res, next) => {
 
     cookies.set(res, 'token', token);
 
-    logger.info(`User registered successfully: ${email}`);
+    logger.info(`User registered: ${email}`);
 
     res.status(201).json({
       message: 'User registered',
@@ -51,9 +48,6 @@ export const signup = async (req, res, next) => {
   }
 };
 
-// =====================
-// SIGNIN
-// =====================
 export const signin = async (req, res, next) => {
   try {
     const validationResult = signinSchema.safeParse(req.body);
@@ -101,14 +95,9 @@ export const signin = async (req, res, next) => {
   }
 };
 
-// =====================
-// SIGNOUT
-// =====================
 export const signout = async (req, res, next) => {
   try {
     cookies.clear(res, 'token');
-
-    logger.info('User signed out');
     res.status(200).json({ message: 'User signed out successfully' });
   } catch (error) {
     logger.error('signout error', error);
