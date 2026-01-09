@@ -121,7 +121,10 @@ describe('E2E User Flow', () => {
         .set('Cookie', [`token=${newAuthToken}`])
         .expect(404);
 
-      expect(deletedUserResponse.body).toHaveProperty('error', 'User not found');
+      expect(deletedUserResponse.body).toHaveProperty(
+        'error',
+        'User not found'
+      );
     }, 30000);
   });
 
