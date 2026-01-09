@@ -29,7 +29,7 @@ export const securityMiddleware = async (req, res, next) => {
       })
     );
     const decision = await client.protect(req);
-    
+
     if (decision.isDenied() && decision.reason.isBot()) {
       logger.warn('Bot req blocked', {
         ip: req.ip,
