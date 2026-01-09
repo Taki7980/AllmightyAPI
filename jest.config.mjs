@@ -1,8 +1,6 @@
 const config = {
   clearMocks: true,
-
   collectCoverage: true,
-
   coverageDirectory: 'coverage',
   testEnvironment: 'node',
   transform: {},
@@ -18,4 +16,5 @@ const config = {
     '^#validations/(.*)$': '<rootDir>/src/validations/$1',
   },
 };
+
 export default config;

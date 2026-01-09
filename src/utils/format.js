@@ -1,6 +1,6 @@
 export const formatValidationErrors = error => {
   if (!error || !error.issues) {
-    return 'validation failed';
+    return 'Validation failed';
   }
 
   if (Array.isArray(error.issues)) {

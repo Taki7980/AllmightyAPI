@@ -18,7 +18,7 @@ export const signup = async (req, res, next) => {
 
     const { name, email, password, role } = validationResult.data;
 
-    const user = await createUser({ name, email, password, role });
+    const user = await createUser({ name, email, password, role: role || 'user' });
 
     const token = jwttoken.sign({
       id: user.id,
@@ -30,7 +30,7 @@ export const signup = async (req, res, next) => {
 
     logger.info(`User registered: ${email}`);
 
-    res.status(201).json({
+    return res.status(201).json({
       message: 'User registered',
       user: {
         id: user.id,
@@ -80,7 +80,7 @@ export const signin = async (req, res, next) => {
 
     logger.info(`User logged in: ${email}`);
 
-    res.status(200).json({
+    return res.status(200).json({
       message: 'User signed in',
       user: {
         id: user.id,
@@ -98,7 +98,7 @@ export const signin = async (req, res, next) => {
 export const signout = async (req, res, next) => {
   try {
     cookies.clear(res, 'token');
-    res.status(200).json({ message: 'User signed out successfully' });
+    return res.status(200).json({ message: 'User signed out successfully' });
   } catch (error) {
     logger.error('signout error', error);
     next(error);

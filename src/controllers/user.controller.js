@@ -14,7 +14,7 @@ import { formatValidationErrors } from '#utils/format.js';
 export const fetchAllUsers = async (req, res, next) => {
   try {
     const allUsers = await getAllUsersService();
-    res.json({
+    return res.json({
       message: 'Successfully retrieved users',
       users: allUsers,
       count: allUsers.length,
@@ -37,7 +37,7 @@ export const fetchUserById = async (req, res, next) => {
 
     const { id } = validationResult.data;
     const user = await getUserByIdService(id);
-    res.json({
+    return res.json({
       message: 'Successfully retrieved user',
       user,
     });
@@ -88,7 +88,7 @@ export const updateUserById = async (req, res, next) => {
     }
     const updatedUser = await updateUserService(id, updates);
 
-    res.json({
+    return res.json({
       message: 'User updated successfully',
       user: updatedUser,
     });
@@ -121,7 +121,7 @@ export const deleteUserById = async (req, res, next) => {
     }
     await deleteUserService(id);
 
-    res.json({
+    return res.json({
       message: 'User deleted successfully',
     });
   } catch (error) {

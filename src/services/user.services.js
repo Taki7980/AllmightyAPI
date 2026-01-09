@@ -36,31 +36,33 @@ export const getUserByIdService = async id => {
       .where(eq(users.id, id))
       .limit(1);
 
-    if (result.length === 0) {
+    if (!result || result.length === 0) {
       throw new Error('User not found');
     }
 
     return result[0];
   } catch (error) {
-    logger.error(`Error getting user by id: ${id}`, error);
     if (error.message === 'User not found') {
       throw error;
     }
+    logger.error(`Error getting user by id: ${id}`, error);
     throw new Error('Error fetching user by ID');
   }
 };
 
 export const updateUserService = async (id, updates) => {
   try {
+    // check if user exists first
     const existingUser = await db
       .select()
       .from(users)
       .where(eq(users.id, id))
       .limit(1);
 
-    if (existingUser.length === 0) {
+    if (!existingUser || existingUser.length === 0) {
       throw new Error('User not found');
     }
+
     const [updatedUser] = await db
       .update(users)
       .set({
@@ -96,7 +98,7 @@ export const deleteUserService = async id => {
       .where(eq(users.id, id))
       .limit(1);
 
-    if (existingUser.length === 0) {
+    if (!existingUser || existingUser.length === 0) {
       throw new Error('User not found');
     }
     await db.delete(users).where(eq(users.id, id));

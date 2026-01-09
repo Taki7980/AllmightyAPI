@@ -9,17 +9,14 @@ export const securityMiddleware = async (req, res, next) => {
     }
 
     const role = req.user?.role || 'guest';
-    let limit;
-    switch (role) {
-      case 'admin':
-        limit = 20;
-        break;
-      case 'user':
-        limit = 10;
-        break;
-      default:
-        limit = 5;
-    }
+    
+    // rate limits based on user role
+    const limits = {
+      admin: 20,
+      user: 10,
+      guest: 5,
+    };
+    const limit = limits[role] || 5;
     const client = aj.withRule(
       slidingWindow({
         mode: 'LIVE',
@@ -30,6 +27,7 @@ export const securityMiddleware = async (req, res, next) => {
     );
     const decision = await client.protect(req);
 
+    // check for bot requests
     if (decision.isDenied() && decision.reason.isBot()) {
       logger.warn('Bot req blocked', {
         ip: req.ip,

@@ -5,11 +5,12 @@ import users from '#models/user.model.js';
 import { eq } from 'drizzle-orm';
 
 export const hashedPassword = async password => {
+  const saltRounds = 10; // bcrypt default
   try {
-    return await bcrypt.hash(password, 10);
+    return await bcrypt.hash(password, saltRounds);
   } catch (error) {
-    logger.error(`Error hashing the password: ${error}`);
-    throw new Error('Error hashing');
+    logger.error(`Error hashing password: ${error}`);
+    throw new Error('Error hashing password');
   }
 };
 
@@ -20,8 +21,10 @@ export const createUser = async ({ name, email, password, role = 'user' }) => {
       .from(users)
       .where(eq(users.email, email))
       .limit(1);
-    if (existingUser.length > 0)
+    if (existingUser.length > 0) {
       throw new Error('User with this email already exists');
+    }
+    
     const hash_password = await hashedPassword(password);
     const [newUser] = await db
       .insert(users)
@@ -33,7 +36,7 @@ export const createUser = async ({ name, email, password, role = 'user' }) => {
         role: users.role,
         created_at: users.created_at,
       });
-    logger.info(`user ${newUser.email} created successfully`);
+    logger.info(`New user created: ${newUser.email}`);
     return newUser;
   } catch (error) {
     logger.error(`Error while creating user: ${error}`);
@@ -46,7 +49,11 @@ export const createUser = async ({ name, email, password, role = 'user' }) => {
 
 export const findUserByEmail = async email => {
   try {
-    const result = await db.select().from(users).where(eq(users.email, email));
+    const result = await db
+      .select()
+      .from(users)
+      .where(eq(users.email, email))
+      .limit(1);
     return result[0] || null;
   } catch (error) {
     logger.error(`Error finding user by email: ${email}`, error);
