@@ -9,7 +9,7 @@ import { authenticate } from '#middleware/auth.middleware.js';
 
 export const UserRouter = express.Router();
 
-// Apply authentication middleware to all user routes
+// all routes require auth
 UserRouter.use(authenticate);
 
 UserRouter.get('/', fetchAllUsers);

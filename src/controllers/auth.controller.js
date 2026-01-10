@@ -6,9 +6,6 @@ import { cookies } from '#utils/cookies.js';
 import { signupSchema, signinSchema } from '#validations/auth.validations.js';
 import bcrypt from 'bcrypt';
 
-// =====================
-// SIGNUP
-// =====================
 export const signup = async (req, res, next) => {
   try {
     const validationResult = signupSchema.safeParse(req.body);
@@ -51,9 +48,6 @@ export const signup = async (req, res, next) => {
   }
 };
 
-// =====================
-// SIGNIN
-// =====================
 export const signin = async (req, res, next) => {
   try {
     const validationResult = signinSchema.safeParse(req.body);
@@ -101,9 +95,6 @@ export const signin = async (req, res, next) => {
   }
 };
 
-// =====================
-// SIGNOUT
-// =====================
 export const signout = async (req, res, next) => {
   try {
     cookies.clear(res, 'token');

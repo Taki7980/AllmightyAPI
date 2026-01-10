@@ -16,7 +16,7 @@ export const fetchAllUsers = async (req, res, next) => {
     logger.info('Getting all Users...');
     const allUsers = await getAllUsersService();
     res.json({
-      message: 'Successfully retrived users',
+      message: 'Successfully retrieved users',
       users: allUsers,
       count: allUsers.length,
     });
@@ -75,7 +75,7 @@ export const updateUserById = async (req, res, next) => {
     const updates = bodyValidation.data;
     const userId = parseInt(id);
 
-    // Check if user is trying to update their own profile or is an admin
+    // check permissions - users can only update themselves unless admin
     if (req.user.id !== userId && req.user.role !== 'admin') {
       return res.status(403).json({
         error: 'Forbidden',
@@ -83,7 +83,7 @@ export const updateUserById = async (req, res, next) => {
       });
     }
 
-    // Only admins can change roles
+    // role changes require admin
     if (updates.role && req.user.role !== 'admin') {
       return res.status(403).json({
         error: 'Forbidden',
@@ -120,7 +120,7 @@ export const deleteUserById = async (req, res, next) => {
     const { id } = validationResult.data;
     const userId = parseInt(id);
 
-    // Check if user is trying to delete their own profile or is an admin
+    // users can only delete themselves unless admin
     if (req.user.id !== userId && req.user.role !== 'admin') {
       return res.status(403).json({
         error: 'Forbidden',

@@ -52,7 +52,7 @@ export const getUserByIdService = async id => {
 
 export const updateUserService = async (id, updates) => {
   try {
-    // Check if user exists
+    // check user exists first
     const existingUser = await db
       .select()
       .from(users)
@@ -93,7 +93,7 @@ export const updateUserService = async (id, updates) => {
 
 export const deleteUserService = async id => {
   try {
-    // Check if user exists
+    // verify user exists before deleting
     const existingUser = await db
       .select()
       .from(users)
