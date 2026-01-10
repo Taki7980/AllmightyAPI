@@ -24,6 +24,7 @@
     "format:check": "prettier --check .",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
+    "db:migrate:ci": "node scripts/migrate-ci.js",
     "db:studio": "drizzle-kit studio",
     "docker:dev": "docker compose -f docker-compose.dev.yml up --build",
     "docker:dev:d": "docker compose -f docker-compose.dev.yml up --build -d",
@@ -67,6 +68,7 @@
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.4",
     "jest": "^30.2.0",
+    "pg": "^8.15.6",
     "prettier": "^3.6.2",
     "supertest": "^7.1.4"
   }
