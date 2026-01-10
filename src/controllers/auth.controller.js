@@ -6,6 +6,9 @@ import { cookies } from '#utils/cookies.js';
 import { signupSchema, signinSchema } from '#validations/auth.validations.js';
 import bcrypt from 'bcrypt';
 
+// =====================
+// SIGNUP
+// =====================
 export const signup = async (req, res, next) => {
   try {
     const validationResult = signupSchema.safeParse(req.body);
@@ -18,7 +21,7 @@ export const signup = async (req, res, next) => {
 
     const { name, email, password, role } = validationResult.data;
 
-    const user = await createUser({ name, email, password, role: role || 'user' });
+    const user = await createUser({ name, email, password, role });
 
     const token = jwttoken.sign({
       id: user.id,
@@ -28,9 +31,9 @@ export const signup = async (req, res, next) => {
 
     cookies.set(res, 'token', token);
 
-    logger.info(`User registered: ${email}`);
+    logger.info(`User registered successfully: ${email}`);
 
-    return res.status(201).json({
+    res.status(201).json({
       message: 'User registered',
       user: {
         id: user.id,
@@ -48,6 +51,9 @@ export const signup = async (req, res, next) => {
   }
 };
 
+// =====================
+// SIGNIN
+// =====================
 export const signin = async (req, res, next) => {
   try {
     const validationResult = signinSchema.safeParse(req.body);
@@ -80,7 +86,7 @@ export const signin = async (req, res, next) => {
 
     logger.info(`User logged in: ${email}`);
 
-    return res.status(200).json({
+    res.status(200).json({
       message: 'User signed in',
       user: {
         id: user.id,
@@ -95,10 +101,15 @@ export const signin = async (req, res, next) => {
   }
 };
 
+// =====================
+// SIGNOUT
+// =====================
 export const signout = async (req, res, next) => {
   try {
     cookies.clear(res, 'token');
-    return res.status(200).json({ message: 'User signed out successfully' });
+
+    logger.info('User signed out');
+    res.status(200).json({ message: 'User signed out successfully' });
   } catch (error) {
     logger.error('signout error', error);
     next(error);

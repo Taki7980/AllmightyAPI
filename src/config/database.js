@@ -10,5 +10,4 @@ if (process.env.NODE_ENV === 'development') {
 
 const sql = neon(process.env.DATABASE_URL);
 const db = drizzle(sql);
-
 export { sql, db };

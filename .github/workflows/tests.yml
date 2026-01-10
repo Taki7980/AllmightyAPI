@@ -33,7 +33,7 @@ jobs:
 
       - name: Run tests
         id: run-tests
-        run: pnpm test -- --coverage --passWithNoTests
+        run: pnpm test -- --coverage
 
       - name: Upload coverage report
         if: always()

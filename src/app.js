@@ -11,7 +11,7 @@ import { UserRouter } from '#routes/user.routes.js';
 const app = express();
 app.use(helmet());
 app.use(express.json());
-app.use(express.urlencoded({ extended: true })); // for form data
+app.use(express.urlencoded({ extended: true }));
 app.use(
   morgan('combined', {
     stream: {
@@ -22,34 +22,32 @@ app.use(
   })
 );
 app.use(securityMiddleware);
-app.use(cors()); // allow all origins for now
+app.use(cors());
 app.use(cookieParser());
 
 app.get('/', (req, res) => {
-  res.send('Hello World');
+  logger.info('hello from allMightyAPI');
+  res.send('hello world');
 });
 
 app.get('/health', (req, res) => {
-  res.json({
+  res.status(200).json({
     status: 'ok',
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
   });
 });
-
 app.get('/api', (req, res) => {
   res.status(200).json({
-    message: 'AllmightyAPI running',
+    message: 'allMightyAPI runnnig',
     timestamp: new Date().toISOString(),
   });
 });
 
 app.use('/api/auth', authRouter);
 app.use('/api/users', UserRouter);
-
-// catch all - 404
 app.use((req, res) => {
-  res.status(404).json({ error: 'Route not found' });
+  res.status(404).json({ error: 'Route Not Found...' });
 });
 
 export default app;

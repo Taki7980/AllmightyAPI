@@ -1,11 +1,11 @@
 const config = {
   clearMocks: true,
+
   collectCoverage: true,
+
   coverageDirectory: 'coverage',
   testEnvironment: 'node',
-  testTimeout: 30000,
   transform: {},
-  setupFiles: ['<rootDir>/tests/setup.js'],
   moduleNameMapper: {
     '^#src/(.*)$': '<rootDir>/src/$1',
     '^#config/(.*)$': '<rootDir>/src/config/$1',
@@ -18,5 +18,4 @@ const config = {
     '^#validations/(.*)$': '<rootDir>/src/validations/$1',
   },
 };
-
 export default config;

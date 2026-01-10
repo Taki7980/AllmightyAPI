@@ -9,14 +9,18 @@ export const securityMiddleware = async (req, res, next) => {
     }
 
     const role = req.user?.role || 'guest';
-
-    // rate limits based on user role
-    const limits = {
-      admin: 20,
-      user: 10,
-      guest: 5,
-    };
-    const limit = limits[role] || 5;
+    let limit;
+    switch (role) {
+      case 'admin':
+        limit = 20;
+        break;
+      case 'user':
+        limit = 10;
+        break;
+      case 'guest':
+        limit = 5;
+        break;
+    }
     const client = aj.withRule(
       slidingWindow({
         mode: 'LIVE',
@@ -26,15 +30,46 @@ export const securityMiddleware = async (req, res, next) => {
       })
     );
     const decision = await client.protect(req);
-
-    // check for bot requests
     if (decision.isDenied() && decision.reason.isBot()) {
       logger.warn('Bot req blocked', {
         ip: req.ip,
         userAgent: req.get('User-Agent'),
         path: req.path,
       });
-      return res.status(403).json({
+      res.status(403).json({
+        error: 'Forbidden',
+        message: 'Automated requests are not allowed',
+      });
+    }
+    if (decision.isDenied() && decision.reason.isBot()) {
+      logger.warn('Bot req blocked', {
+        ip: req.ip,
+        userAgent: req.get('User-Agent'),
+        path: req.path,
+      });
+      res.status(403).json({
+        error: 'Forbidden',
+        message: 'Automated requests are not allowed',
+      });
+    }
+    if (decision.isDenied() && decision.reason.isBot()) {
+      logger.warn('Bot req blocked', {
+        ip: req.ip,
+        userAgent: req.get('User-Agent'),
+        path: req.path,
+      });
+      res.status(403).json({
+        error: 'Forbidden',
+        message: 'Automated requests are not allowed',
+      });
+    }
+    if (decision.isDenied() && decision.reason.isBot()) {
+      logger.warn('Bot req blocked', {
+        ip: req.ip,
+        userAgent: req.get('User-Agent'),
+        path: req.path,
+      });
+      res.status(403).json({
         error: 'Forbidden',
         message: 'Automated requests are not allowed',
       });
@@ -46,7 +81,7 @@ export const securityMiddleware = async (req, res, next) => {
         path: req.path,
         method: req.method,
       });
-      return res.status(403).json({
+      res.status(403).json({
         error: 'Forbidden',
         message: 'Request blocked by security policy',
       });
@@ -57,17 +92,17 @@ export const securityMiddleware = async (req, res, next) => {
         userAgent: req.get('User-Agent'),
         path: req.path,
       });
-      return res.status(429).json({
-        error: 'Too Many Requests',
-        message: 'Rate limit exceeded. Please try again later.',
+      res.status(403).json({
+        error: 'Forbidden',
+        message: 'Too many requests',
       });
     }
     next();
   } catch (error) {
-    logger.error('Arcjet middleware error:', error);
-    res.status(500).json({
-      error: 'Internal server error',
-      message: 'Something went wrong with security middleware',
+    console.error('Arcjet middleware error: ', error);
+    res.status(501).json({
+      error: 'Internal server error: ',
+      message: 'something went wrong with security middleware',
     });
   }
 };

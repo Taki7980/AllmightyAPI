@@ -5,28 +5,23 @@ import users from '#models/user.model.js';
 import { eq } from 'drizzle-orm';
 
 export const hashedPassword = async password => {
-  const saltRounds = 10;
   try {
-    return await bcrypt.hash(password, saltRounds);
+    return await bcrypt.hash(password, 10);
   } catch (error) {
-    logger.error(`Error hashing password: ${error}`);
-    throw new Error('Error hashing password');
+    logger.error(`Error hashing the password: ${error}`);
+    throw new Error('Error hashing');
   }
 };
 
 export const createUser = async ({ name, email, password, role = 'user' }) => {
   try {
-    const existingUser = await db
+    const exixtingUser = await db
       .select()
       .from(users)
       .where(eq(users.email, email))
       .limit(1);
-    if (existingUser.length > 0) {
-      throw new Error('User with this email already exists');
-    }
-
+    if (exixtingUser.length > 0) throw new Error('User already exists');
     const hash_password = await hashedPassword(password);
-    
     const [newUser] = await db
       .insert(users)
       .values({ name, email, password: hash_password, role })
@@ -37,27 +32,15 @@ export const createUser = async ({ name, email, password, role = 'user' }) => {
         role: users.role,
         created_at: users.created_at,
       });
-    logger.info(`New user created: ${newUser.email}`);
+    logger.info(`user ${newUser.email} created successfully`);
     return newUser;
   } catch (error) {
-    logger.error(`Error while creating user: ${error}`);
-    if (error.message === 'User with this email already exists') {
-      throw error;
-    }
-    throw new Error('Error creating user');
+    logger.error(`Error while creating an User: ${error}`);
+    throw new Error('Error creating an User');
   }
 };
 
 export const findUserByEmail = async email => {
-  try {
-    const result = await db
-      .select()
-      .from(users)
-      .where(eq(users.email, email))
-      .limit(1);
-    return result[0] || null;
-  } catch (error) {
-    logger.error(`Error finding user by email: ${email}`, error);
-    throw error;
-  }
+  const result = await db.select().from(users).where(eq(users.email, email));
+  return result[0] || null;
 };

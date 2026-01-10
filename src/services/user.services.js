@@ -5,7 +5,7 @@ import { eq } from 'drizzle-orm';
 
 export const getAllUsersService = async () => {
   try {
-    const result = await db
+    return await db
       .select({
         id: users.id,
         email: users.email,
@@ -15,10 +15,9 @@ export const getAllUsersService = async () => {
         updated_at: users.updated_at,
       })
       .from(users);
-    return result;
   } catch (error) {
     logger.error('Error getting users', error);
-    throw new Error('Error fetching users');
+    throw new Error('Error fetching all Users');
   }
 };
 
@@ -37,32 +36,34 @@ export const getUserByIdService = async id => {
       .where(eq(users.id, id))
       .limit(1);
 
-    if (!result || result.length === 0) {
+    if (result.length === 0) {
       throw new Error('User not found');
     }
 
     return result[0];
   } catch (error) {
+    logger.error(`Error getting user by id: ${id}`, error);
     if (error.message === 'User not found') {
       throw error;
     }
-    logger.error(`Error getting user by id: ${id}`, error);
     throw new Error('Error fetching user by ID');
   }
 };
 
 export const updateUserService = async (id, updates) => {
   try {
+    // Check if user exists
     const existingUser = await db
       .select()
       .from(users)
       .where(eq(users.id, id))
       .limit(1);
 
-    if (!existingUser || existingUser.length === 0) {
+    if (existingUser.length === 0) {
       throw new Error('User not found');
     }
 
+    // Update user
     const [updatedUser] = await db
       .update(users)
       .set({
@@ -92,15 +93,18 @@ export const updateUserService = async (id, updates) => {
 
 export const deleteUserService = async id => {
   try {
+    // Check if user exists
     const existingUser = await db
       .select()
       .from(users)
       .where(eq(users.id, id))
       .limit(1);
 
-    if (!existingUser || existingUser.length === 0) {
+    if (existingUser.length === 0) {
       throw new Error('User not found');
     }
+
+    // Delete user
     await db.delete(users).where(eq(users.id, id));
 
     logger.info(`User ${id} deleted successfully`);
