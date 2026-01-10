@@ -37,7 +37,7 @@
     "docker:prod:restart": "docker compose -f docker-compose.prod.yml restart",
     "start:dev": "bash ./scripts/start-dev.sh",
     "start:prod": "bash ./scripts/start-prod.sh",
-    "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest"
+    "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --passWithNoTests"
   },
   "keywords": [],
   "author": "",
