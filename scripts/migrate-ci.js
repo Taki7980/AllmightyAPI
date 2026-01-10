@@ -12,7 +12,7 @@ async function runMigrations() {
   try {
     // Dynamically import pg only when needed (for CI)
     const { Client } = await import('pg');
-    
+
     const client = new Client({
       connectionString: process.env.DATABASE_URL,
     });
@@ -36,7 +36,12 @@ async function runMigrations() {
     }
 
     // Read migration file
-    const migrationPath = join(__dirname, '..', 'drizzle', '0000_chunky_dazzler.sql');
+    const migrationPath = join(
+      __dirname,
+      '..',
+      'drizzle',
+      '0000_chunky_dazzler.sql'
+    );
     const migrationSQL = readFileSync(migrationPath, 'utf-8');
 
     // Execute migration
