@@ -5,6 +5,7 @@ const config = {
 
   coverageDirectory: 'coverage',
   testEnvironment: 'node',
+  setupFiles: ['<rootDir>/tests/setup.js'],
   transform: {},
   moduleNameMapper: {
     '^#src/(.*)$': '<rootDir>/src/$1',
